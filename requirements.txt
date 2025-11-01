@@ -1,0 +1,18 @@
+# Core numerical and optimization stack
+numpy>=1.23
+matplotlib>=3.7
+pandas>=1.5
+pyomo>=6.5
+
+# Reinforcement learning ecosystem
+gymnasium>=0.28
+stable-baselines3>=2.2
+torch>=2.0
+
+# Visualization and notebook utilities
+plotly>=5.15
+
+# Commercial / external solvers (install separately as licensed binaries)
+gurobipy>=10.0  # requires a valid Gurobi license; provides MIP solvers used by pyomo models
+
+# Optional: install Ipopt binaries (e.g., via conda-forge `ipopt`) for nonlinear subproblem solves
