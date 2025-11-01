@@ -1,22 +1,4 @@
 # Learning to control inexact Benders decomposition via reinforcementlearning
-<!-- > Experimentation toolkit for reinforcement-learning control of inexact generalized Benders decomposition. -->
-<!-- 
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Highlights](#highlights)
-- [Repository Layout](#repository-layout)
-- [Getting Started](#getting-started)
-- [Quick Start](#quick-start)
-- [Experiments & Reproduction](#experiments--reproduction)
-- [Configuration](#configuration)
-- [Data & Assets](#data--assets)
-- [Results](#results)
-- [Contributing](#contributing)
-- [Roadmap](#roadmap)
-- [Citation](#citation)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
-- [Contact](#contact) -->
 
 <!-- ## Abstract -->
 - **Goal:** Benders decomposition (BD), along with its generalized version (GBD), is a widely used algorithm for solvinglarge-scale mixed-integer optimization problems that arise in the operation of process systems. However, theoff-the-shelf application to online settings can be computationally inefficient due to the repeated solution of the master problem. An approach to reduce the solution time is to solve the master problem to local optimality. However, identifying the level of suboptimality at each iteration that minimizes the total solution time is nontrivial.
@@ -24,12 +6,6 @@
 - **Approach:** In this work, we train a reinforcement learning agent to determine the best optimality gap schedule that minimizes the total solution time, balancing the solution time per iteration with optimality gap improvement. 
 
 - **Paper Link:** https://www.sciencedirect.com/science/article/pii/S0098135425004648
-
-<!-- ## Highlights
-- [TODO: Key contribution or capability #1]
-- [TODO: Key contribution or capability #2]
-- [TODO: Add additional bullet points as needed] -->
-
 
 ## Experiments & Reproduction
 - `notebooks/GBD.ipynb`: [vanilla GBD implementation for the integration of scheduling and dynamic optimization problem]
@@ -65,12 +41,13 @@
 ## Citation
 If you use this repository in your research, please cite:
 ```bibtex
-@article{TODO2024rligbd,
-  title   = {Learning to Control Inexact Benders Decomposition via Reinforcement Learning},
-  author  = {TODO: Author list},
-  journal = {TODO: Venue},
-  year    = {2024},
-  url     = {TODO: link}
+@article{li2025learning,
+  title={Learning to control inexact Benders decomposition via reinforcement learning},
+  author={Li, Zhe and Agyeman, Bernard T and Mitrai, Ilias and Daoutidis, Prodromos},
+  journal={Computers \& Chemical Engineering},
+  pages={109461},
+  year={2025},
+  publisher={Elsevier}
 }
 ```
 
