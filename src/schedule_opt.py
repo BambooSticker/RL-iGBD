@@ -1,6 +1,6 @@
 from pyomo.environ import *
 from pyomo.opt import SolverFactory
-from src.tool import get_trans_time_bound, get_trans_cost_bound
+from tool import get_trans_time_bound, get_trans_cost_bound
 import numpy as np
 
 def scheduling_milp_block_rule(block):
@@ -9,7 +9,7 @@ def scheduling_milp_block_rule(block):
     # ========================
     block.I = Set(initialize=['A', 'B', 'C', 'D', 'E'])      # Products
     block.K = Set(initialize=[1, 2, 3, 4, 5])                # Slots
-    block.Kt = Set(initialize=[1, 2, 3, 4])                # Index for slots with transition
+    block.Kt = Set(initialize=[1, 2, 3, 4])                  # Index for slots with transition
 
     block.Tc = Param(initialize=7*24, doc='Cycle time')
 
@@ -187,87 +187,6 @@ def scheduling_milp_block_rule(block):
     # 4. Constraints
     # ========================
 
-    # (*) Linearization of bilinear term
-    def transition_cost_linear_rule1(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_eta[i, ip, k] >= trans_cost_bounds[i, ip][0] * block.z[i, ip, k]
-    block.transition_cost_linear_con1 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule1)
-    
-    def transition_cost_linear_rule2(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_eta[i, ip, k] <= trans_cost_bounds[i, ip][1] * block.z[i, ip, k]
-    block.transition_cost_linear_con2 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule2)
-    
-    def transition_cost_linear_rule3(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_eta[i, ip, k] >= block.eta[i, ip, k] - trans_cost_bounds[i, ip][1] * (1 - block.z[i, ip, k])
-    block.transition_cost_linear_con3 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule3)
-    
-    def transition_cost_linear_rule4(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_eta[i, ip, k] <= block.eta[i, ip, k] - trans_cost_bounds[i, ip][0] * (1 - block.z[i, ip, k])
-    block.transition_cost_linear_con4 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule4)
-    
-    def transition_init_cost_linear_rule1(block, i):
-        return block.bi_eta_init[i] >= trans_init_cost_bounds[i][0] * block.z_init[i]
-    block.transition_init_cost_linear_con1 = Constraint(block.I, rule=transition_init_cost_linear_rule1)
-    
-    def transition_init_cost_linear_rule2(block, i):
-        return block.bi_eta_init[i] <= trans_init_cost_bounds[i][1] * block.z_init[i]
-    block.transition_init_cost_linear_con2 = Constraint(block.I, rule=transition_init_cost_linear_rule2)
-    
-    def transition_init_cost_linear_rule3(block, i):
-        return block.bi_eta_init[i] >= block.eta_init[i] - trans_init_cost_bounds[i][1] * (1 - block.z_init[i])
-    block.transition_init_cost_linear_con3 = Constraint(block.I, rule=transition_init_cost_linear_rule3)
-    
-    def transition_init_cost_linear_rule4(block, i):
-        return block.bi_eta_init[i] <= block.eta_init[i] - trans_init_cost_bounds[i][0] * (1 - block.z_init[i])
-    block.transition_init_cost_linear_con4 = Constraint(block.I, rule=transition_init_cost_linear_rule4)
-    # ----------------
-    def transition_time_linear_rule1(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_tt[i, ip, k] >= trans_time_bounds[i, ip][0] * block.z[i, ip, k]
-    block.transition_time_linear_con1 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule1)
-    
-    def transition_time_linear_rule2(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_tt[i, ip, k] <= trans_time_bounds[i, ip][1] * block.z[i, ip, k]
-    block.transition_time_linear_con2 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule2)
-    
-    def transition_time_linear_rule3(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_tt[i, ip, k] >= block.tt[i, ip, k] - trans_time_bounds[i, ip][1] * (1 - block.z[i, ip, k])
-    block.transition_time_linear_con3 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule3)
-    
-    def transition_time_linear_rule4(block, i, ip, k):
-        if i == ip:
-            return Constraint.Skip
-        return block.bi_tt[i, ip, k] <= block.tt[i, ip, k] # - trans_time_bounds[i, ip][0] * (1 - block.z[i, ip, k])
-    block.transition_time_linear_con4 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule4)
-    
-    def transition_init_time_linear_rule1(block, i):
-        return block.bi_tt_init[i] >= trans_init_time_bounds[i][0] * block.z_init[i]
-    block.transition_init_time_linear_con1 = Constraint(block.I, rule=transition_init_time_linear_rule1)
-    
-    def transition_init_time_linear_rule2(block, i):
-        return block.bi_tt_init[i] <= trans_init_time_bounds[i][1] * block.z_init[i]
-    block.transition_init_time_linear_con2 = Constraint(block.I, rule=transition_init_time_linear_rule2)
-    
-    def transition_init_time_linear_rule3(block, i):
-        return block.bi_tt_init[i] >= block.tt_init[i] - trans_init_time_bounds[i][1] * (1 - block.z_init[i])
-    block.transition_init_time_linear_con3 = Constraint(block.I, rule=transition_init_time_linear_rule3)
-    
-    def transition_init_time_linear_rule4(block, i):
-        return block.bi_tt_init[i] <= block.tt_init[i] - trans_init_time_bounds[i][0] * (1 - block.z_init[i])
-    block.transition_init_time_linear_con4 = Constraint(block.I, rule=transition_init_time_linear_rule4)
-
     # (a) Product assignment constraints
     def switch_rule(block, i, ip, k):
         return block.z[i, ip, k] >= block.y[i, k] + block.y[ip, k+1] - 1
@@ -363,6 +282,87 @@ def scheduling_milp_block_rule(block):
     def Cyctime_rule(block, k):
         return block.te[k] <= block.Tc
     block.Cyctime_con = Constraint(block.K, rule=Cyctime_rule)
+
+    # (*) Linearization of bilinear term
+    def transition_cost_linear_rule1(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_eta[i, ip, k] >= trans_cost_bounds[i, ip][0] * block.z[i, ip, k]
+    block.transition_cost_linear_con1 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule1)
+    
+    def transition_cost_linear_rule2(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_eta[i, ip, k] <= trans_cost_bounds[i, ip][1] * block.z[i, ip, k]
+    block.transition_cost_linear_con2 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule2)
+    
+    def transition_cost_linear_rule3(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_eta[i, ip, k] >= block.eta[i, ip, k] - trans_cost_bounds[i, ip][1] * (1 - block.z[i, ip, k])
+    block.transition_cost_linear_con3 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule3)
+    
+    def transition_cost_linear_rule4(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_eta[i, ip, k] <= block.eta[i, ip, k] - trans_cost_bounds[i, ip][0] * (1 - block.z[i, ip, k])
+    block.transition_cost_linear_con4 = Constraint(block.I, block.I, block.Kt, rule=transition_cost_linear_rule4)
+    
+    def transition_init_cost_linear_rule1(block, i):
+        return block.bi_eta_init[i] >= trans_init_cost_bounds[i][0] * block.z_init[i]
+    block.transition_init_cost_linear_con1 = Constraint(block.I, rule=transition_init_cost_linear_rule1)
+    
+    def transition_init_cost_linear_rule2(block, i):
+        return block.bi_eta_init[i] <= trans_init_cost_bounds[i][1] * block.z_init[i]
+    block.transition_init_cost_linear_con2 = Constraint(block.I, rule=transition_init_cost_linear_rule2)
+    
+    def transition_init_cost_linear_rule3(block, i):
+        return block.bi_eta_init[i] >= block.eta_init[i] - trans_init_cost_bounds[i][1] * (1 - block.z_init[i])
+    block.transition_init_cost_linear_con3 = Constraint(block.I, rule=transition_init_cost_linear_rule3)
+    
+    def transition_init_cost_linear_rule4(block, i):
+        return block.bi_eta_init[i] <= block.eta_init[i] - trans_init_cost_bounds[i][0] * (1 - block.z_init[i])
+    block.transition_init_cost_linear_con4 = Constraint(block.I, rule=transition_init_cost_linear_rule4)
+
+    def transition_time_linear_rule1(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_tt[i, ip, k] >= trans_time_bounds[i, ip][0] * block.z[i, ip, k]
+    block.transition_time_linear_con1 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule1)
+    
+    def transition_time_linear_rule2(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_tt[i, ip, k] <= trans_time_bounds[i, ip][1] * block.z[i, ip, k]
+    block.transition_time_linear_con2 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule2)
+    
+    def transition_time_linear_rule3(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_tt[i, ip, k] >= block.tt[i, ip, k] - trans_time_bounds[i, ip][1] * (1 - block.z[i, ip, k])
+    block.transition_time_linear_con3 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule3)
+    
+    def transition_time_linear_rule4(block, i, ip, k):
+        if i == ip:
+            return Constraint.Skip
+        return block.bi_tt[i, ip, k] <= block.tt[i, ip, k] # - trans_time_bounds[i, ip][0] * (1 - block.z[i, ip, k])
+    block.transition_time_linear_con4 = Constraint(block.I, block.I, block.Kt, rule=transition_time_linear_rule4)
+    
+    def transition_init_time_linear_rule1(block, i):
+        return block.bi_tt_init[i] >= trans_init_time_bounds[i][0] * block.z_init[i]
+    block.transition_init_time_linear_con1 = Constraint(block.I, rule=transition_init_time_linear_rule1)
+    
+    def transition_init_time_linear_rule2(block, i):
+        return block.bi_tt_init[i] <= trans_init_time_bounds[i][1] * block.z_init[i]
+    block.transition_init_time_linear_con2 = Constraint(block.I, rule=transition_init_time_linear_rule2)
+    
+    def transition_init_time_linear_rule3(block, i):
+        return block.bi_tt_init[i] >= block.tt_init[i] - trans_init_time_bounds[i][1] * (1 - block.z_init[i])
+    block.transition_init_time_linear_con3 = Constraint(block.I, rule=transition_init_time_linear_rule3)
+    
+    def transition_init_time_linear_rule4(block, i):
+        return block.bi_tt_init[i] <= block.tt_init[i] - trans_init_time_bounds[i][0] * (1 - block.z_init[i])
+    block.transition_init_time_linear_con4 = Constraint(block.I, rule=transition_init_time_linear_rule4)
 
     # A constrant list for storing Benders cuts
     block.benders_cuts = ConstraintList()

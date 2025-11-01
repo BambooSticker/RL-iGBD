@@ -1,5 +1,16 @@
 import numpy as np
 
+"""
+Proposed: 
+    - PPOPolicy: RL-based gap tolerance selection rule.
+
+Baseline policies:
+    - OptimalPolicy: The master problem is optimized at every iteration (classic GBD).
+    - RandomPolicy: Randomly selected action in the adaptive action space, mimicing an
+                    untrained RL policy.
+    - ExponentialPolicy: iGBD with an heuristic exponentially decaying tolerance sequence.
+"""
+
 class PPOPolicy:
     def __init__(self, model, env):
         self.model = model
@@ -10,17 +21,14 @@ class PPOPolicy:
         raw = -1.0 + 2.0 * raw_idx / float(11 - 1)
         mp_gap_tol_u = 0.3
         mp_gap_tol_u_l = 1e-3
-        print('raw index:', raw)
 
         scale = np.sqrt(self.env.obs_rms.var + self.env.epsilon)
         obs_true = obs_norm * scale + self.env.obs_rms.mean
         true_gap = obs_true[0][9]
-        print('true gap:', true_gap)
 
         factor = mp_gap_tol_u_l + (raw + 1.0) * 0.5 * (true_gap - mp_gap_tol_u_l)
         # Clip to original bounds
         factor = [np.clip(factor, mp_gap_tol_u_l, mp_gap_tol_u)]
-        print('tolerance', factor)
 
         return factor, state
     
@@ -34,17 +42,14 @@ class OptimalPolicy:
         raw = -1.0 + 2.0 * raw_idx / float(11 - 1)
         mp_gap_tol_u = 0.3
         mp_gap_tol_u_l = 1e-3
-        print('raw index:', raw)
 
         scale = np.sqrt(self.env.obs_rms.var + self.env.epsilon)
         obs_true = obs_norm * scale + self.env.obs_rms.mean
         true_gap = obs_true[0][9]
-        print('true gap:', true_gap)
 
         factor = mp_gap_tol_u_l + (raw + 1.0) * 0.5 * (true_gap - mp_gap_tol_u_l)
         # Clip to original bounds
         factor = [np.clip(factor, mp_gap_tol_u_l, mp_gap_tol_u)]
-        print('tolerance', factor)
 
         return factor, state
     
@@ -58,17 +63,14 @@ class RandomPolicy:
         raw = -1.0 + 2.0 * raw_idx / float(self.K - 1)
         mp_gap_tol_u = 0.3
         mp_gap_tol_u_l = 1e-3
-        print('raw index:', raw)
 
         scale = np.sqrt(self.env.obs_rms.var + self.env.epsilon)
         obs_true = obs_norm * scale + self.env.obs_rms.mean
         true_gap = obs_true[0][9]
-        print('true gap:', true_gap)
 
         factor = mp_gap_tol_u_l + (raw + 1.0) * 0.5 * (true_gap - mp_gap_tol_u_l)
         # Clip to original bounds
         factor = [np.clip(factor, mp_gap_tol_u_l, mp_gap_tol_u)]
-        print('tolerance', factor)
 
         return factor, state
     
