@@ -4,7 +4,7 @@ from gymnasium.spaces import MultiDiscrete
 import numpy as np
 from pyomo.environ import *
 from pyomo.opt import TerminationCondition
-from tool import solve_mp_milp
+from tools import solve_mp_milp
 from dynamic_opt import transition_block_rule, transition_init_block_rule
 from schedule_opt import scheduling_milp_block_rule
 from itertools import permutations
