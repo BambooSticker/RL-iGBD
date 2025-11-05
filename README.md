@@ -1,4 +1,4 @@
-# Learning to control inexact Benders decomposition via reinforcementlearning
+# Learning to control inexact Benders decomposition via reinforcement learning
 
 <!-- ## Abstract -->
 - **Goal:** Benders decomposition (BD), along with its generalized version (GBD), is a widely used algorithm for solvinglarge-scale mixed-integer optimization problems that arise in the operation of process systems. However, theoff-the-shelf application to online settings can be computationally inefficient due to the repeated solution of the master problem. An approach to reduce the solution time is to solve the master problem to local optimality. However, identifying the level of suboptimality at each iteration that minimizes the total solution time is nontrivial.
